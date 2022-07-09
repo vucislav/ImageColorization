@@ -27,7 +27,7 @@ class Generator(Module):
         self.e6 = up_block(256, 64, act=ReLU())
         self.e7 = up_block(128, 64, act=ReLU())
 
-        self.final = ConvBlock(128, 3, kernel_sz=1, act=Tanh())
+        self.final = ConvBlock(128, 2, kernel_sz=1, act=Tanh())
         
 
     def forward(self, x):

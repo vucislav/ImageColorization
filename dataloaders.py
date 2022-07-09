@@ -1,7 +1,6 @@
 import os
 import cv2
 import numpy as np
-import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision.transforms.functional import to_tensor
 
@@ -18,9 +17,9 @@ class ColorizationDataset(Dataset):
         full_path = os.path.join(self.ds_path, self.file_names[idx])
         img = cv2.imread(full_path)
 
-        bw, gt = cvt(img)
+        img = cvt(img)
         
-        return bw, gt
+        return img
 
 
 def get_dataloader(dataset_path):
@@ -30,17 +29,17 @@ def get_dataloader(dataset_path):
 def cvt(x):
     img = x.astype(np.float32)/255.0          
 
-    gt = cv2.cvtColor(img, cv2.COLOR_RGB2LAB)
-    bw = np.expand_dims(cv2.cvtColor(img, cv2.COLOR_RGB2GRAY), axis=2)
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2LAB)
+    # bw = np.expand_dims(cv2.cvtColor(img, cv2.COLOR_RGB2GRAY), axis=2)
 
-    gt[:, :, 0] = gt[:, :, 0]/50 - 1
-    gt[:, :, 1] = gt[:, :, 1]/127
-    gt[:, :, 2] = gt[:, :, 2]/127
+    img[:, :, 0] = img[:, :, 0]/50 - 1
+    img[:, :, 1] = img[:, :, 1]/127
+    img[:, :, 2] = img[:, :, 2]/127
 
-    gt = to_tensor(gt).to('cuda')
-    bw = to_tensor(bw).to('cuda')
+    img = to_tensor(img).to('cuda')
+    # bw = to_tensor(bw).to('cuda')
 
-    return bw, gt
+    return img
 
 
 def cvt_back(x):

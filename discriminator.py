@@ -8,7 +8,7 @@ class Discriminator(Module):
         super().__init__()
 
         conv_block = partial(ConvBlock, kernel_sz=4, stride=2, padding=1, batch_norm=True)
-        self.c1 = ConvBlock(4, 64, kernel_sz=1, batch_norm=True, act=LeakyReLU(0.2))
+        self.c1 = ConvBlock(3, 64, kernel_sz=1, batch_norm=True, act=LeakyReLU(0.2))
         self.c2 = conv_block(64, 64, act=LeakyReLU(0.2))
         self.c3 = conv_block(64, 128, act=LeakyReLU(0.2))
         self.c4 = conv_block(128, 256, act=LeakyReLU(0.2))

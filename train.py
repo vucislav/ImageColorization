@@ -20,20 +20,23 @@ def train_epoch(train_dl, val_dl, gen, disc, loss_gen, loss_disc, gen_optim, dis
     disc_fake_loss = 0
 
     # train
-    for X, y in tqdm(train_dl):
+    for X in tqdm(train_dl):
 
-        target_ones = torch.ones(y.size(0), 1, 1, 1).to('cuda')
-        target_zeros = torch.zeros(y.size(0), 1, 1, 1).to('cuda')
+        x_l = X[:, [0], :, :]
+        x_ab = X[:, 1:3, :, :]
+
+        target_ones = torch.ones(X.size(0), 1, 1, 1).to('cuda')
+        target_zeros = torch.zeros(X.size(0), 1, 1, 1).to('cuda')
 
         # training the generator
         gen_optim.zero_grad()
-        fake = gen(X)
+        fake = gen(x_l)
 
-        disc_input = torch.cat([X, fake], dim=1)
+        disc_input = torch.cat([x_l, fake], dim=1)
         disc_pred = disc(disc_input)
 
         adv_loss = loss_disc(disc_pred, target_ones)
-        l1_loss = loss_gen(fake, y)
+        l1_loss = loss_gen(fake, x_ab)
         gen_loss = adv_loss + lambd*l1_loss
 
         gen_adv_loss += adv_loss.item()
@@ -45,8 +48,8 @@ def train_epoch(train_dl, val_dl, gen, disc, loss_gen, loss_disc, gen_optim, dis
 
         # training the discriminator
         disc_optim.zero_grad()
-        disc_pred_real = disc(torch.cat([X, y], dim=1))
-        disc_pred_fake = disc(torch.cat([X, fake.detach()], dim=1))
+        disc_pred_real = disc(X)
+        disc_pred_fake = disc(torch.cat([x_l, fake.detach()], dim=1))
 
         real_loss = loss_disc(disc_pred_real, target_ones*smoothing)
         fake_loss = loss_disc(disc_pred_fake, target_zeros)
